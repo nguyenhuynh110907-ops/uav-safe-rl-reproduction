@@ -6,6 +6,24 @@ These values are from one deterministic episode per condition. They verify the
 pipeline and expose useful failure modes; they are not statistical performance
 claims.
 
+## Flight paths
+
+The [animated 10% actuator-loss replay](assets/flight_motor_loss_10.gif) shows
+the figure-eight target and each controller's simulated x–z position. The
+right-hand panel tracks position error; its vertical line marks fault onset at
+2 s. Symbols indicate position only, not aircraft attitude.
+
+![Flight paths and tracking error with 10% actuator thrust loss](assets/flight_motor_loss_10.svg)
+
+At 10% loss, PID terminates early; PPO and PPO + MPSC complete the six-second
+flight. The safety filter lowers PPO's violation count from 31 to 4 steps.
+
+![Flight paths and tracking error with 20% actuator thrust loss](assets/flight_motor_loss_20.svg)
+
+At 20% loss, all three runs meet the safety-failure criterion. PID's short
+track is an early termination, not a successful recovery. These are single
+episodes (seed 1337), not typical flight envelopes.
+
 | Scenario | Controller | RMSE (m) | Violation steps | Safety failure | MPSC feasible |
 |---|---|---:|---:|:---:|---:|
 | Nominal | PID | 0.083 | 58 | No | — |

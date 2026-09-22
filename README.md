@@ -5,7 +5,12 @@ reproduction compares three controllers as a simulated 2D quadrotor follows a
 figure eight. At two seconds, the environment applies a lateral force or reduces
 one motor group's thrust. All runs use the same trajectory and initial state.
 
-![Tracking error and safety violations across six scenarios](results/summary.png)
+![Animated 2D flight paths and tracking error after 10% actuator thrust loss](assets/flight_motor_loss_10.gif)
+
+The moving symbols mark each controller's **simulated position**, not aircraft
+attitude. The dashed target is a figure eight; the actuator fault begins at
+**t = 2 s**. [Open the full-resolution static figure](assets/flight_motor_loss_10.svg)
+or [compare the 20% loss case](assets/flight_motor_loss_20.svg).
 
 The project builds on
 [`safe-control-gym`](https://github.com/learnsyslab/safe-control-gym) at commit
@@ -77,6 +82,8 @@ experiment.
 
 See [`RESULTS.md`](RESULTS.md) for the complete table and interpretation.
 
+![Tracking error and safety violations across six scenarios](results/summary.png)
+
 ## Run it
 
 Requirements: Apple Silicon macOS, Conda, Git, and an internet connection for
@@ -115,6 +122,21 @@ To sample different starting states, use `--randomized-init --seeds 11 22 33 44
 - `results.json`: metrics plus trajectories and upstream source commit;
 - `trajectory_<scenario>.png`: reference and flown paths;
 - `summary.png`: RMSE and constraint violation comparison.
+
+To make a flight replay from any `results.json`, run:
+
+```bash
+./conda311/bin/python visualize_flights.py \
+  --results ./results-local/results.json \
+  --out ./assets-local \
+  --scenario motor_loss_10 \
+  --gif
+```
+
+The command writes an editable SVG, a PNG, and (with `--gif`) an animated GIF.
+Use `--scenario motor_loss_20` or another scenario ID for a different replay.
+The committed visualizations in `assets/` show seed 1337 from the supplied
+deterministic run.
 
 `energy_proxy_n2s` is the integral of squared actuator thrust, not battery
 energy. Use it only for relative comparison.
