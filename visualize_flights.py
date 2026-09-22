@@ -22,6 +22,7 @@ CONTROLLERS = {
     "ppo_mpsc": {"name": "PPO + MPSC", "color": "#218477", "style": "-", "marker": "D"},
 }
 CTRL_FREQ = 50
+TEXT_COLOR = "#000000"
 
 
 def load_runs(source: Path, scenario: str, seed: int) -> dict:
@@ -58,21 +59,23 @@ def make_figure(runs: dict, scenario: str, seed: int):
         "xtick.labelsize": 9,
         "ytick.labelsize": 9,
         "svg.fonttype": "none",
+        "text.color": TEXT_COLOR,
+        "axes.labelcolor": TEXT_COLOR,
+        "xtick.color": TEXT_COLOR,
+        "ytick.color": TEXT_COLOR,
     })
     fig = plt.figure(figsize=(11.8, 6.4), facecolor="#FAFBFC")
     grid = fig.add_gridspec(1, 2, width_ratios=[1.2, 1], left=0.075, right=0.965,
-                           top=0.76, bottom=0.235, wspace=0.22)
+                           top=0.76, bottom=0.28, wspace=0.22)
     path_ax = fig.add_subplot(grid[0, 0])
     error_ax = fig.add_subplot(grid[0, 1])
 
-    fig.text(0.075, 0.93, "FLIGHT REPLAY  /  2D QUADROTOR", color="#53718A",
-             fontsize=9, weight="bold")
-    fig.text(0.075, 0.858, scenario_name(scenario), color="#162A3A",
+    fig.text(0.075, 0.91, scenario_name(scenario), color=TEXT_COLOR,
              fontsize=20, weight="bold")
     subtitle = "Figure-eight target · 6 s flight · disturbance begins at 2 s" if scenario != "nominal" else \
         "Figure-eight target · 6 s flight · no injected disturbance"
-    fig.text(0.075, 0.809, subtitle, color="#566673", fontsize=10)
-    clock = fig.text(0.965, 0.927, "t = 6.0 s", ha="right", color="#162A3A",
+    fig.text(0.075, 0.835, subtitle, color=TEXT_COLOR, fontsize=10)
+    clock = fig.text(0.965, 0.91, "t = 6.0 s", ha="right", color=TEXT_COLOR,
                      fontsize=12, weight="bold")
 
     for axis in (path_ax, error_ax):
@@ -81,7 +84,7 @@ def make_figure(runs: dict, scenario: str, seed: int):
         axis.set_axisbelow(True)
         for spine in axis.spines.values():
             spine.set_color("#D5E0E8")
-        axis.tick_params(colors="#405666")
+        axis.tick_params(colors=TEXT_COLOR)
 
     first = runs["ppo"]["trajectory"]
     target_x = np.asarray(first["reference_x"], dtype=float)
@@ -91,8 +94,8 @@ def make_figure(runs: dict, scenario: str, seed: int):
     path_ax.scatter(target_x[0], target_z[0], s=45, marker="s",
                     facecolor="white", edgecolor="#344F62", linewidth=1.5, zorder=4)
     path_ax.annotate("START", (target_x[0], target_z[0]), xytext=(9, -17),
-                     textcoords="offset points", color="#344F62", fontsize=8, weight="bold")
-    path_ax.set_title("Where each controller flew", loc="left", color="#162A3A", weight="bold")
+                     textcoords="offset points", color=TEXT_COLOR, fontsize=8, weight="bold")
+    path_ax.set_title("Where each controller flew", loc="left", color=TEXT_COLOR, weight="bold")
     path_ax.set_xlabel("Horizontal position x (m)")
     path_ax.set_ylabel("Altitude z (m)")
 
@@ -130,8 +133,9 @@ def make_figure(runs: dict, scenario: str, seed: int):
     path_ax.set_xlim(x_min, x_max)
     path_ax.set_ylim(z_min, z_max)
     path_ax.set_aspect("equal", adjustable="box")
+    path_ax.set_anchor("N")
 
-    error_ax.set_title("How far from the target", loc="left", color="#162A3A", weight="bold")
+    error_ax.set_title("How far from the target", loc="left", color=TEXT_COLOR, weight="bold")
     error_ax.set_xlabel("Flight time (s)")
     error_ax.set_ylabel("Position error (m)")
     error_ax.set_xlim(0, 6)
@@ -140,7 +144,7 @@ def make_figure(runs: dict, scenario: str, seed: int):
     if scenario != "nominal":
         error_ax.axvline(2.0, color="#A04A4E", linestyle=(0, (2, 2)), linewidth=1.5)
         error_ax.annotate("DISTURBANCE", (2.0, error_ax.get_ylim()[1]),
-                          xytext=(5, -16), textcoords="offset points", color="#A04A4E",
+                          xytext=(5, -16), textcoords="offset points", color=TEXT_COLOR,
                           fontsize=8, weight="bold", va="top")
 
     legend_handles = [Line2D([0], [0], color="#344F62", lw=1.9, ls="--", label="Target")]
@@ -160,10 +164,10 @@ def make_figure(runs: dict, scenario: str, seed: int):
         metrics.append(
             f"{style['name']}: {status}  ·  {int(row['constraint_violation_steps'])} violation steps"
         )
-    fig.text(0.075, 0.088, "     |     ".join(metrics), color="#405666", fontsize=8.5)
+    fig.text(0.075, 0.088, "     |     ".join(metrics), color=TEXT_COLOR, fontsize=8.5)
     fig.text(0.075, 0.05,
              "Paths show simulated x–z position. A moving symbol marks position, not aircraft attitude. Seed "
-             f"{seed}; one episode per controller.", color="#7A8994", fontsize=8)
+             f"{seed}; one episode per controller.", color=TEXT_COLOR, fontsize=8)
     return fig, clock, paths, dots, errors
 
 
